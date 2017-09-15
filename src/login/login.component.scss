@@ -1,0 +1,15 @@
+@import url('http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css');
+
+.icon {
+   font-size: 30px;
+}
+
+.login-bg {
+    background-image: url('../../img/background.png')!important;
+    background-size: 100% auto!important;
+}
+
+login {
+  display: flex;
+  flex: 1;
+}

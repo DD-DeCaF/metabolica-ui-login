@@ -1,0 +1,104 @@
+{
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module"
+  },
+  "extends": "eslint:recommended",
+  "rules": {
+    "no-unused-vars": ["warn", {"argsIgnorePattern": "^_"}],
+    "no-console": "warn",
+    "curly": "error",
+    "one-var": [
+      "error",
+      {
+        "initialized": "never"
+      }
+    ],
+    "semi": [
+      "warn",
+      "always",
+      {
+        "omitLastInOneLineBlock": true
+      }
+    ],
+    "quotes": [
+      "warn",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ],
+    "operator-linebreak": ["warn", "after"],
+    "array-bracket-spacing": [
+      "error",
+      "never"
+    ],
+    "no-var": "error",
+    "quote-props": [
+      "error",
+      "consistent-as-needed",
+      {
+        "keywords": true,
+        "numbers": true
+      }
+    ],
+    "object-shorthand": [
+      "warn",
+      "always",
+      {
+        "avoidQuotes": true,
+        "avoidExplicitReturnArrows": true
+      }
+    ],
+    "arrow-parens": [
+      "error",
+      "as-needed"
+    ],
+    "arrow-body-style": [
+      "error",
+      "as-needed"
+    ],
+    "arrow-spacing": "error",
+    "no-confusing-arrow": "error",
+    "no-useless-constructor": "warn",
+    "no-multi-spaces": "error",
+    "no-whitespace-before-property": "error",
+    "space-before-blocks": [
+      "error",
+      "always"
+    ],
+    "space-infix-ops": "error",
+    "space-in-parens": [
+      "error",
+      "never"
+    ],
+    "space-before-function-paren": [
+      "error",
+      {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }
+    ],
+    "space-unary-ops": [
+      "error",
+      {
+        "words": true,
+        "nonwords": false
+      }
+    ],
+    "keyword-spacing": [
+      "error",
+      {
+        "before": true,
+        "after": true
+      }
+    ]
+  }
+}
