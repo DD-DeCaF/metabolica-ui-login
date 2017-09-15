@@ -17,7 +17,7 @@
                     <label>Username</label>
                     <md-icon>person</md-icon>
                     <input ng-disabled="loginForm.$submitted"
-                           ng-model="$ctrl.credentials.username"
+                           ng-model="ctrl.credentials.username"
                            ng-change="loginForm.password.$setValidity('auth', true)"
                            id="username"
                            name="username"
@@ -34,7 +34,7 @@
                     <label>Password</label>
                     <md-icon>lock</md-icon>
                     <input ng-disabled="loginForm.$submitted"
-                           ng-model="$ctrl.credentials.password"
+                           ng-model="ctrl.credentials.password"
                            ng-change="loginForm.password.$setValidity('auth', true)"
                            id="password"
                            name="password"
@@ -52,17 +52,16 @@
                     <md-button
                             type="submit"
                             ng-disabled="loginForm.$invalid || loginForm.$submitted"
-                            ng-click="$ctrl.authenticate(loginForm, $ctrl.credentials)" class="md-primary md-raised">Login
+                            ng-click="ctrl.authenticate(loginForm, ctrl.credentials)" class="md-primary md-raised">Login
                     </md-button>
                 </div>
             </md-card-content>
-			HELLLLLLLO
             <md-card-content layout="row">
                 <p layout="row" flex="25">You can also:</p>
-                <md-button  ng-click="$ctrl.signInWithSocial(loginForm, 'google')" class="md-warn md-raised md-hue-2" layout="row" flex>
+                <md-button  ng-click="ctrl.signInWithSocial(loginForm, 'google')" class="md-warn md-raised md-hue-2" layout="row" flex>
                     <i class="icon ion-social-googleplus" layout="column" flex="20"></i><span layout="column">Login with Google</span>
                 </md-button>
-                <md-button ng-click="$ctrl.signInWithSocial(loginForm, 'github')" class="md-primary md-raised" layout="row" flex>
+                <md-button ng-click="ctrl.signInWithSocial(loginForm, 'github')" class="md-primary md-raised" layout="row" flex>
                     <i class="icon ion-social-github" layout="column" flex="20"></i> Login with Github
                 </md-button>
             </md-card-content>

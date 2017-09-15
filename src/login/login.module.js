@@ -1,9 +1,9 @@
 import angular from 'angular';
 import 'angular-ui-router';
-import {LoginComponent} from './login.component';
+import {LoginSocialComponent} from './login.component';
 
-export const LoginModule = angular.module('login', ['ui.router'])
-    .component('login', LoginComponent)
+export const LoginModule = angular.module('loginSocial', ['ui.router'])
+    .component('login', LoginSocialComponent)
 	.config(function ($stateProvider, appAuthProvider) {
 		appAuthProvider.isRequired = false;
         $stateProvider.state('login', {

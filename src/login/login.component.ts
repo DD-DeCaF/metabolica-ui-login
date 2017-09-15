@@ -17,7 +17,7 @@ interface Credentials {
 }
 
 /** This class is LoginComponent's controller */
-class LoginController {
+class LoginSocialController {
     appName: string;
     credentials: Credentials;
     authenticate: (form: any, credentials: Credentials, socialAuth: boolean) => void;
@@ -28,7 +28,7 @@ class LoginController {
      * @param Session  comment login Session parameter
      * @param appName  The application name to show during login
      */
-    constructor($scope, $timeout, $state, $stateParams, $location, Session, appName: string) {
+    constructor($scope, $timeout, $state, $stateParams, $location, $window, Session, appName: string) {
         this.appName = appName;
         this.credentials = {
             username: '',
@@ -37,7 +37,14 @@ class LoginController {
 
         this.authenticate = async (form: any, credentials: Credentials, socialAuth: boolean = false) => {
             try {
-                await Session.authenticate(credentials, socialAuth);
+                await Session.authenticate(credentials);
+                if (socialAuth) {
+                    // need to refresh the page before proceeding
+                    $timeout(() => {
+                        $window.location.href = '/app/home';
+                    }, 100);
+                    return;
+                }
 
                 if ($stateParams.next) {
                     $timeout(() => {
@@ -55,36 +62,32 @@ class LoginController {
             }
         };
 
+        /** @method signInWithSocial
+         * @param form  LoginForm
+         * @param provider  a string with the provider id ("google" or "github")
+         * @returns Uses Firebase to provide the authentication with Github and Google
+         */
         this.signInWithSocial = (form: any, provider: string) => {
+            firebase.auth().signOut();
             let providers = {
                 'google': new firebase.auth.GoogleAuthProvider(),
                 'github': new firebase.auth.GithubAuthProvider(),
             };
             firebase.auth().signInWithPopup(providers[provider]).then((result) => {
                 firebase.auth().currentUser.getToken(true).then((idToken) => {
-                  this.authenticate(form, {'username': result.user.uid, 'password': idToken}, true);
+                    this.authenticate(form, {'username': result.user.uid, 'password': idToken}, true);
                 }).catch(function(error) {
-                  console.log(error);
+                    console.log(error);
                 });
             }).catch(function(error) {
                 console.log(error);
             });
         };
     }
-
-    /** @method exampleMethod
-     * @param foo  A very detailed comment login the foo parameter
-     * @param bar  Something less detailed for bar
-     * @returns    The concatenation of the two parameters in input
-     */
-    exampleMethod(foo: string, bar: string): string {
-        console.log('An example of how to document a method.');
-        return foo + bar;
-    }
 }
 
-export const LoginComponent = {
-    controller: LoginController,
+export const LoginSocialComponent = {
+    controller: LoginSocialController,
     controllerAs: 'ctrl',
     template: template.toString()
 };
