@@ -72,7 +72,11 @@ class LoginSocialController {
             let providers = {
                 'google': new firebase.auth.GoogleAuthProvider(),
                 'github': new firebase.auth.GithubAuthProvider(),
+                'twitter': new firebase.auth.TwitterAuthProvider(),
             };
+            if (provider == 'github') {
+                providers[provider].addScope('user:email');
+            }
             firebase.auth().signInWithPopup(providers[provider]).then((result) => {
                 firebase.auth().currentUser.getToken(true).then((idToken) => {
                     this.authenticate(form, {'username': result.user.uid, 'password': idToken}, true);

@@ -57,12 +57,15 @@
                 </div>
             </md-card-content>
             <md-card-content layout="row">
-                <p layout="row" flex="25">You can also:</p>
-                <md-button  ng-click="ctrl.signInWithSocial(loginForm, 'google')" class="md-warn md-raised md-hue-2" layout="row" flex>
-                    <img src="./../../img/google-plus.svg" class="social-logo">Login with Google
-                </md-button>
+				<p layout="row" flex="35">You can also log in with:</p>
                 <md-button ng-click="ctrl.signInWithSocial(loginForm, 'github')" class="md-primary md-raised" layout="row" flex>
-                    <img src="./../../img/github.svg" class="social-logo">Login with Github
+                    <img src="./../../img/github.svg" class="social-logo">Github
+                </md-button>
+                <md-button  ng-click="ctrl.signInWithSocial(loginForm, 'google')" class="md-warn md-raised md-hue-2" layout="row" flex>
+                    <img src="./../../img/google-plus.svg" class="social-logo">Google
+                </md-button>
+                <md-button ng-click="ctrl.signInWithSocial(loginForm, 'twitter')" class="md-primary md-raised twitter" layout="row" flex>
+                    <img src="./../../img/twitter.svg" class="social-logo">Twitter
                 </md-button>
             </md-card-content>
         </md-card>
