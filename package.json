@@ -5,10 +5,10 @@
   "dependencies": {
     "angular": "^1.6.2",
     "angular-fixed-table-header": "github:daniel-nagy/fixed-table-header",
-	"angular-ui-router": "1.0.0-rc.1",
+    "angular-ui-router": "1.0.0-rc.1",
     "metabolica": "github:biosustain/metabolica-ui",
-	"angularfire": "^2.3.0",
-	"firebase": "^3.6.6"
+    "angularfire": "^2.3.0",
+    "firebase": "^3.6.6"
   },
   "scripts": {
     "build": "webpack",
@@ -20,7 +20,7 @@
     "@types/node": "^7.0.5",
     "angular": "^1.6.2",
     "babel-core": "^6.22.1",
-	"babel-eslint": "^7.2.3",
+    "babel-eslint": "^7.2.3",
     "babel-loader": "^6.2.10",
     "babel-plugin-transform-runtime": "^6.22.0",
     "babel-preset-es2015": "^6.22.0",
@@ -35,7 +35,7 @@
     "node-sass": "^4.5.0",
     "sass-loader": "^5.0.1",
     "ts-loader": "^2.0.0",
-	"typedoc": "^0.8.0",
+    "typedoc": "^0.8.0",
     "typescript": "^2.1.6",
     "webpack": "^3.5.6",
     "webpack-dev-server": "^2.8.1"
