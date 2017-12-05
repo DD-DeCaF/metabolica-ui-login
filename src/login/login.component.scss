@@ -1,7 +1,3 @@
-.icon {
-   font-size: 30px;
-}
-
 .login-bg:before {
   content: "";
   position: fixed;
@@ -10,7 +6,7 @@
   width: 100%;
   height: 100%;
   z-index: -1;
-  
+
   display: block;
   background-image: url('../../img/background.png')!important;
 
@@ -35,4 +31,8 @@
 login {
   display: flex;
   flex: 1;
+}
+
+.twitter {
+  background-color : rgb(66, 156, 214)!important;
 }
