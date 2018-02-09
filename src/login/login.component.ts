@@ -28,33 +28,20 @@ class LoginSocialController {
      * @param Session  comment login Session parameter
      * @param appName  The application name to show during login
      */
-    constructor($scope, $timeout, $state, $stateParams, $location, $window, Session, appName: string) {
+    constructor($scope, $timeout, $window, Session, appName: string) {
         this.appName = appName;
         this.credentials = {
             username: '',
             password: ''
         };
 
-        this.authenticate = async (form: any, credentials: Credentials, socialAuth: boolean = false) => {
+        this.authenticate = async (form: any, credentials: Credentials) => {
             try {
                 await Session.authenticate(credentials);
-                if (socialAuth) {
-                    // need to refresh the page before proceeding
-                    $timeout(() => {
-                        $window.location.href = '/app/home';
-                    }, 100);
-                    return;
-                }
-
-                if ($stateParams.next) {
-                    $timeout(() => {
-                        $location
-                            .path(decodeURIComponent($stateParams.next))
-                            .search({}); // clear the next param
-                    }, 100);
-                } else {
-                    $state.go('app.home');
-                }
+                // need to refresh the page before proceeding
+                $timeout(() => {
+                    $window.location.href = '/app/home';
+                }, 100);
             } catch (invalidCredentials) {
                 form.password.$setValidity('auth', false);
                 form.$setPristine();
@@ -82,7 +69,7 @@ class LoginSocialController {
             }
             firebase.auth().signInWithPopup(providers[provider]).then((result) => {
                 firebase.auth().currentUser.getToken(true).then((idToken) => {
-                    this.authenticate(form, {'username': result.user.uid, 'password': idToken}, true);
+                    this.authenticate(form, {'username': result.user.uid, 'password': idToken});
                 }).catch(function(error) {
                     console.log(error);
                 });
