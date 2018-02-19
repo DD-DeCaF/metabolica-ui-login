@@ -11,33 +11,28 @@ firebase.initializeApp({
   messagingSenderId: process.env.FIREBASE_SENDER_ID
 });
 
-interface Credentials {
-  email: string;
-  password: string;
-}
-
 /** This class is LoginComponent's controller */
 class LoginSocialController {
   appName: string;
-  credentials: Credentials;
-  authenticate: (form: any, credentials: Credentials, socialAuth: boolean) => void;
+  credentials: object;
+  authenticate: (form: any, credentials: object, firebase: boolean) => void;
   signInWithSocial: (form: any, provider: string) => void;
 
   /**
    * LoginController class constructor
-   * @param Session  comment login Session parameter
-   * @param appName  The application name to show during login
+   * @param Session  login Session parameter
+   * @param appName       The application name to show during login
    */
-  constructor($scope, $timeout, $window, Session, appName: string) {
+  constructor($scope, $timeout, $window, Session, appName: string, $state) {
     this.appName = appName;
     this.credentials = {
       email: '',
-      password: ''
+      password: '',
     };
 
-    this.authenticate = async (form: any, credentials: Credentials) => {
+    this.authenticate = async (form: any, credentials: object, firebase: boolean = false) => {
       try {
-        await Session.authenticate(credentials);
+        await Session.authenticate(credentials, firebase);
         // need to refresh the page before proceeding
         $timeout(() => {
           $window.location.href = '/app/home';
@@ -69,7 +64,7 @@ class LoginSocialController {
       }
       firebase.auth().signInWithPopup(providers[provider]).then((result) => {
         firebase.auth().currentUser.getToken(true).then((idToken) => {
-          this.authenticate(form, {'username': result.user.uid, 'password': idToken});
+          this.authenticate(form, {'uid': result.user.uid, 'token': idToken}, true);
         }).catch(function(error) {
           console.log(error);
         });
