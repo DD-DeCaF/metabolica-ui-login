@@ -12,7 +12,7 @@ firebase.initializeApp({
 });
 
 interface Credentials {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -31,7 +31,7 @@ class LoginSocialController {
   constructor($scope, $timeout, $window, Session, appName: string) {
     this.appName = appName;
     this.credentials = {
-      username: '',
+      email: '',
       password: ''
     };
 

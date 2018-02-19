@@ -29,18 +29,18 @@
 
           <md-input-container class="md-icon-float md-icon-left"> <!--TODO: md-icon-left is a temp fix, remove once AM fixes this-->
             <!-- Use floating label instead of placeholder -->
-            <label>Username</label>
+            <label>Email</label>
             <md-icon>person</md-icon>
             <input ng-disabled="loginForm.$submitted"
-                   ng-model="ctrl.credentials.username"
+                   ng-model="ctrl.credentials.email"
                    ng-change="loginForm.password.$setValidity('auth', true)"
-                   id="username"
-                   name="username"
+                   id="email"
+                   name="email"
                    type="text"
                    required>
 
-            <div ng-messages="loginForm.username.$error" ng-if="loginForm.username.$touched">
-              <div ng-message="required">You <b>must</b> specify a username.</div>
+            <div ng-messages="loginForm.email.$error" ng-if="loginForm.email.$touched">
+              <div ng-message="required">You <b>must</b> specify an email address.</div>
             </div>
           </md-input-container>
 
@@ -58,7 +58,7 @@
 
             <div ng-messages="loginForm.password.$error" ng-if="loginForm.password.$touched">
               <div ng-message="required">You <b>must</b> specify a password.</div>
-              <div ng-message="auth">Your username or password are incorrect.</div>
+              <div ng-message="auth">Your email address or password is incorrect.</div>
             </div>
           </md-input-container>
 
