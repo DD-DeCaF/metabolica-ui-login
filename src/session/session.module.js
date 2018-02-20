@@ -3,7 +3,7 @@ import 'ngstorage';
 import querystring from 'query-string';
 
 
-function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
+function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast) {
   return {
     isAuthenticated() {
       return !this.expired();
@@ -68,6 +68,19 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
       });
     },
 
+    invalidate() {
+      $log.debug(`Session: Invalidating session and forcing user to re-login`);
+      this.logout();
+      $state.go('login').then(() => {
+        $mdToast.show($mdToast.simple()
+          .theme('warn-toast')
+          .textContent('Your session has expired. Please log in again.')
+          .hideDelay(6000)
+          .action('close')
+          .position('top right'));
+      });
+    },
+
     logout(next = null) {
       delete $localStorage.authorization_token;
       delete $localStorage.refresh_token;
@@ -91,7 +104,6 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       let $localStorage = $injector.get('$localStorage');
       let Session = $injector.get('Session');
       let $log = $injector.get('$log');
-      let $state = $injector.get('$state');
 
       // Ignore authorization logic if there is no active session
       if (!$localStorage.authorization_token) {
@@ -108,11 +120,10 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
         return config;
       }
 
-      // If the session has expired, force the user to re-login
+      // If the session has expired, invalidate it and abort the request
       if (Session.expired()) {
-        $log.info(`SessionInterceptor: Session has expired, aborting request and forcing user to login`);
-        Session.logout();
-        $state.go('login');
+        $log.info(`SessionInterceptor: Session has expired, aborting request`);
+        Session.invalidate();
         config.timeout = $q.when();  // aborts the request
         return config;
       }
@@ -139,7 +150,9 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
         return refreshTokenPromise.then(() => {
           return config;
         }).catch(() => {
-          // TODO: refresh token wasn't updated, should probably cancel this request
+          $log.info(`SessionInterceptor: Auth token refresh failed, aborting request`);
+          Session.invalidate();
+          config.timeout = $q.when();  // aborts the request
           return config;
         });
       }
@@ -166,7 +179,7 @@ export const SessionModule = angular
   ])
   .factory('Session', SessionFactory)
   .factory('sessionInterceptor', SessionInterceptorFactory)
-  .run(function ($rootScope, $state, $location, $log, $mdDialog, Session, Project, appAuth) {
+  .run(function ($rootScope, $state, $location, $log, $mdDialog, Session, Project, appAuth, $mdToast) {
 
     if (!Session.isAuthenticated()) {
       $rootScope.isAuthenticated = false;
@@ -181,6 +194,6 @@ export const SessionModule = angular
       }
     } else {
       $rootScope.isAuthenticated = true;
-      $log.debug("NOTE: metabolica-ui Session module is overridden, but may still produce message 'Session expires undefined' above");
+      $log.debug("NOTE: metabolica-ui Session module is overridden, but may still produce invalid message 'Session expires ...' above");
     }
   });
