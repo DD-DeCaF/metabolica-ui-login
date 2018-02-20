@@ -6,35 +6,29 @@ import querystring from 'query-string';
 function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
   return {
     isAuthenticated() {
-      return !this.refreshExpired();
+      return !this.expired();
     },
 
-    jwtExpired() {
-      if (!$localStorage.jwt) {
-        return true;
-      }
-      return this.jwtExpires() <= new Date();
-    },
-
-    jwtExpires() {
-      if (!$localStorage.jwt) {
-        return;
-      }
-      return new Date(JSON.parse(atob($localStorage.jwt.split('.')[1])).exp * 1000);
-    },
-
-    refreshExpired() {
+    expired() {
       if (!$localStorage.refresh_token) {
         return true;
       }
-      return this.refreshExpires() <= new Date();
+      return this.expires() <= new Date();
     },
 
-    refreshExpires() {
-      if(!$localStorage.refresh_token) {
-        return;
-      }
+    expires() {
       return new Date(JSON.parse($localStorage.refresh_token.exp) * 1000);
+    },
+
+    authorizationExpired() {
+      if (!$localStorage.authorization_token) {
+        return true;
+      }
+      return this.authorizationExpires() <= new Date();
+    },
+
+    authorizationExpires() {
+      return new Date(JSON.parse(atob($localStorage.authorization_token.split('.')[1])).exp * 1000);
     },
 
     getCurrentUser() {
@@ -49,7 +43,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
         refreshTokenRequest: true,
       }).then(response => {
         $log.info("Session: Token refresh successful, saving new JWT in local storage");
-        $localStorage.jwt = response.data;
+        $localStorage.authorization_token = response.data;
       }).catch(error => {
         $log.info(`Session: Token refresh failure`);
         $log.debug(error);
@@ -62,11 +56,11 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
       return $http.post(`${process.env.IAM_API}${endpoint}`, params, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       }).then(response => {
-        $log.info("Session: Authentication successful, saving received tokens in local storage");
-        $localStorage.jwt = response.data.jwt;
+        $localStorage.authorization_token = response.data.jwt;
         $localStorage.refresh_token = response.data.refresh_token;
         $rootScope.$broadcast('session:login');
         $rootScope.isAuthenticated = true;
+        $log.info(`Session: Authentication successful. Session expires: ${this.expires()}, authorization expires: ${this.authorizationExpires()}`);
       }).catch(error => {
         $log.info(`Session: Authentication failure`);
         $log.debug(error);
@@ -75,7 +69,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
     },
 
     logout(next = null) {
-      delete $localStorage.jwt;
+      delete $localStorage.authorization_token;
       delete $localStorage.refresh_token;
       $rootScope.$broadcast('session:logout', {next});
       $rootScope.isAuthenticated = false;
@@ -100,7 +94,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       let $state = $injector.get('$state');
 
       // Ignore authorization logic if there is no active session
-      if (!$localStorage.jwt) {
+      if (!$localStorage.authorization_token) {
         return config;
       }
 
@@ -115,7 +109,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       }
 
       // If the session has expired, force the user to re-login
-      if (Session.refreshExpired()) {
+      if (Session.expired()) {
         $log.info(`SessionInterceptor: Session has expired, aborting request and forcing user to login`);
         Session.logout();
         $state.go('login');
@@ -124,7 +118,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       }
 
       // If the authorization token has expired, refresh it
-      if (Session.jwtExpired()) {
+      if (Session.authorizationExpired()) {
         $log.info(`SessionInterceptor: Request must wait for refreshed JWT`);
 
         // Check for a reference to existing refresh request. If none, then create one
@@ -152,7 +146,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
 
       // Add the current JWT
       $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
-      config.headers.Authorization = `Bearer ${$localStorage.jwt}`;
+      config.headers.Authorization = `Bearer ${$localStorage.authorization_token}`;
       return config;
     },
     responseError(response) {
@@ -188,6 +182,5 @@ export const SessionModule = angular
     } else {
       $rootScope.isAuthenticated = true;
       $log.debug("NOTE: metabolica-ui Session module is overridden, but may still produce message 'Session expires undefined' above");
-      $log.info(`Session expires: ${Session.refreshExpires()}, JWT expires: ${Session.jwtExpires()}`);
     }
   });
