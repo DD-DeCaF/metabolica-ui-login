@@ -1,4 +1,4 @@
-.login-bg:before {
+.login-social-bg:before {
   content: "";
   position: fixed;
   left: 0;
@@ -13,7 +13,7 @@
   filter: blur(3px) brightness(80%);
 }
 
-.login-bg {
+.login-social-bg {
   position: fixed;
   left: 0;
   right: 0;
