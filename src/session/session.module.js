@@ -42,19 +42,33 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
       return null;
     },
 
+    refresh() {
+      $log.info("Session: Refreshing JWT");
+      return $http.post(`${process.env.IAM_API}/refresh`, `refresh_token=${$localStorage.refresh_token.val}`, {
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        refreshTokenRequest: true,
+      }).then(response => {
+        $log.info("Session: Token refresh successful, saving new JWT in local storage");
+        $localStorage.jwt = response.data;
+      }).catch(error => {
+        $log.info(`Session: Token refresh failure`);
+        $log.debug(error);
+      });
+    },
+
     authenticate(credentials, firebase) {
       const params = querystring.stringify(credentials);
       const endpoint = firebase ? '/authenticate/firebase' : '/authenticate/local';
       return $http.post(`${process.env.IAM_API}${endpoint}`, params, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       }).then(response => {
-        $log.info("Authentication successful, saving received tokens in local storage");
+        $log.info("Session: Authentication successful, saving received tokens in local storage");
         $localStorage.jwt = response.data.jwt;
         $localStorage.refresh_token = response.data.refresh_token;
         $rootScope.$broadcast('session:login');
         $rootScope.isAuthenticated = true;
       }).catch(error => {
-        $log.info(`Authentication failure`);
+        $log.info(`Session: Authentication failure`);
         $log.debug(error);
         throw error;
       });
@@ -73,17 +87,72 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state) {
   };
 }
 
-
-// TODO: refresh token logic
 function SessionInterceptorFactory($q, $injector, appAuth) {
+
+  // Points to any ongoing request for refreshing the JWT. Further requests should wait for this promise to resolve.
+  let refreshTokenPromise;
+
   return {
     request(config) {
       let $localStorage = $injector.get('$localStorage');
+      let Session = $injector.get('Session');
+      let $log = $injector.get('$log');
+      let $state = $injector.get('$state');
 
-      // Authorization header should be passed to trusted hosts only
-      if ($localStorage.jwt && appAuth.isTrustedURL(config.url)) {
-        config.headers.Authorization = `Bearer ${$localStorage.jwt}`;
+      // Ignore authorization logic if there is no active session
+      if (!$localStorage.jwt) {
+        return config;
       }
+
+      // Ignore authorization logic for requests to refresh the JWT
+      if (config.refreshTokenRequest) {
+        return config;
+      }
+
+      // Ignore authorization logic for untrusted hosts
+      if (!appAuth.isTrustedURL(config.url)) {
+        return config;
+      }
+
+      // If the session has expired, force the user to re-login
+      if (Session.refreshExpired()) {
+        $log.info(`SessionInterceptor: Session has expired, aborting request and forcing user to login`);
+        Session.logout();
+        $state.go('login');
+        config.timeout = $q.when();  // aborts the request
+        return config;
+      }
+
+      // If the authorization token has expired, refresh it
+      if (Session.jwtExpired()) {
+        $log.info(`SessionInterceptor: Request must wait for refreshed JWT`);
+
+        // Check for a reference to existing refresh request. If none, then create one
+        if (!refreshTokenPromise) {
+          $log.debug(`SessionInterceptor: Creating refresh request promise`);
+
+          // Assign the promise so that further requests may wait for this promise to resolve
+          refreshTokenPromise = Session.refresh();
+
+          // Remove the assignment when the promise resolves
+          refreshTokenPromise.finally(() => {
+            $log.debug(`SessionInterceptor: Refresh request finished, removing promise`);
+            refreshTokenPromise = undefined;
+          });
+        }
+
+        // Wait for the refresh request promise, then return the current config as-is
+        return refreshTokenPromise.then(() => {
+          return config;
+        }).catch(() => {
+          // TODO: refresh token wasn't updated, should probably cancel this request
+          return config;
+        });
+      }
+
+      // Add the current JWT
+      $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
+      config.headers.Authorization = `Bearer ${$localStorage.jwt}`;
       return config;
     },
     responseError(response) {
