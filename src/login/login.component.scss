@@ -35,16 +35,16 @@ login {
 
 .md-button.social-login-button {
   color: white;
-}
 
-.md-button.github {
-  background-color: #303030;
-}
+  &.github {
+    background-color: #303030;
+  }
 
-.md-button.google {
-  background-color: #d34836;
-}
+  &.google {
+    background-color: #d34836;
+  }
 
-.md-button.twitter {
-  background-color: #21aaf5;
+  &.twitter {
+    background-color: #21aaf5;
+  }
 }
