@@ -146,8 +146,10 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
           });
         }
 
-        // Wait for the refresh request promise, then return the current config as-is
+        // Wait for the refresh request promise, then add the new authorization token
         return refreshTokenPromise.then(() => {
+          $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
+          config.headers.Authorization = `Bearer ${$localStorage.authorization_token}`;
           return config;
         }).catch(() => {
           $log.info(`SessionInterceptor: Auth token refresh failed, aborting request`);
