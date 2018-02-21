@@ -10,10 +10,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
     },
 
     expired() {
-      if (!$localStorage.refresh_token) {
-        return true;
-      }
-      return this.expires() <= new Date();
+      return !$localStorage.refresh_token || this.expires() <= new Date();
     },
 
     expires() {
@@ -21,10 +18,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
     },
 
     authorizationExpired() {
-      if (!$localStorage.authorization_token) {
-        return true;
-      }
-      return this.authorizationExpires() <= new Date();
+      return !$localStorage.authorization_token || this.authorizationExpires() <= new Date();
     },
 
     authorizationExpires() {
@@ -160,10 +154,8 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       return config;
     },
     responseError(response) {
-      if (response.status === 401) {
-        if (appAuth.isRequired) {
-          $injector.get('Session').logout(location.pathname);
-        }
+      if (response.status === 401 && appAuth.isRequired) {
+        $injector.get('Session').logout(location.pathname);
       }
       return $q.reject(response);
     }
