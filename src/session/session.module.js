@@ -105,18 +105,13 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       const Session = $injector.get('Session');
       const $log = $injector.get('$log');
 
-      // Ignore authorization logic if there is no active session
-      if (!$localStorage.authorization_token) {
-        return config;
-      }
-
-      // Ignore authorization logic for requests to refresh the authorization token
-      if (config.refreshTokenRequest) {
-        return config;
-      }
-
-      // Ignore authorization logic for untrusted hosts
-      if (!appAuth.isTrustedURL(config.url)) {
+      // Ignore authorization logic:
+      // - there is no active session
+      // - for requests to refresh the authorization token
+      // - for untrusted hosts
+      if (!$localStorage.authorization_token ||
+          config.refreshTokenRequest ||
+          !appAuth.isTrustedURL(config.url)) {
         return config;
       }
 
