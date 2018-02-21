@@ -33,18 +33,18 @@ login {
   flex: 1;
 }
 
-.social-login-button {
-  color: white !important;
+.md-button.social-login-button {
+  color: white;
 }
 
-.github {
-  background-color: #303030 !important;
+.md-button.github {
+  background-color: #303030;
 }
 
-.google {
-  background-color: #d34836 !important;
+.md-button.google {
+  background-color: #d34836;
 }
 
-.twitter {
-  background-color: #21aaf5 !important;
+.md-button.twitter {
+  background-color: #21aaf5;
 }
