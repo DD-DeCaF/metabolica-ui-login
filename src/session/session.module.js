@@ -154,6 +154,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
       return config;
     },
     responseError(response) {
+      // TODO this should only trigger for local API urls
       if (response.status === 401 && appAuth.isRequired) {
         $injector.get('Session').invalidate();
       }
