@@ -155,7 +155,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
     },
     responseError(response) {
       if (response.status === 401 && appAuth.isRequired) {
-        $injector.get('Session').logout(location.pathname);
+        $injector.get('Session').invalidate();
       }
       return $q.reject(response);
     }
