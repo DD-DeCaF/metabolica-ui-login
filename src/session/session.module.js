@@ -37,12 +37,12 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
     },
 
     refresh() {
-      $log.info("Session: Refreshing JWT");
+      $log.info("Session: Refreshing authorization token");
       return $http.post(`${process.env.IAM_API}/refresh`, `refresh_token=${$localStorage.refresh_token.val}`, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         refreshTokenRequest: true,
       }).then(response => {
-        $log.info("Session: Token refresh successful, saving new JWT in local storage");
+        $log.info("Session: Token refresh successful, saving new authorization token in local storage");
         $localStorage.authorization_token = response.data;
       }).catch(error => {
         $log.info(`Session: Token refresh failure`);
@@ -96,7 +96,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
 
 function SessionInterceptorFactory($q, $injector, appAuth) {
 
-  // Points to any ongoing request for refreshing the JWT. Further requests should wait for this promise to resolve.
+  // Points to any ongoing request for refreshing the authorization token. Further requests should wait for this promise to resolve.
   let refreshTokenPromise;
 
   return {
@@ -110,7 +110,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
         return config;
       }
 
-      // Ignore authorization logic for requests to refresh the JWT
+      // Ignore authorization logic for requests to refresh the authorization token
       if (config.refreshTokenRequest) {
         return config;
       }
@@ -130,7 +130,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
 
       // If the authorization token has expired, refresh it
       if (Session.authorizationExpired()) {
-        $log.info(`SessionInterceptor: Request must wait for refreshed JWT`);
+        $log.info(`SessionInterceptor: Request must wait for refreshed authorization token`);
 
         // Check for a reference to existing refresh request. If none, then create one
         if (!refreshTokenPromise) {
@@ -159,7 +159,7 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
         });
       }
 
-      // Add the current JWT
+      // Add the current authorization token
       $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
       config.headers.Authorization = `Bearer ${$localStorage.authorization_token}`;
       return config;
