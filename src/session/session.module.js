@@ -101,9 +101,9 @@ function SessionInterceptorFactory($q, $injector, appAuth) {
 
   return {
     request(config) {
-      let $localStorage = $injector.get('$localStorage');
-      let Session = $injector.get('Session');
-      let $log = $injector.get('$log');
+      const $localStorage = $injector.get('$localStorage');
+      const Session = $injector.get('Session');
+      const $log = $injector.get('$log');
 
       // Ignore authorization logic if there is no active session
       if (!$localStorage.authorization_token) {
