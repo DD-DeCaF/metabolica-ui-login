@@ -176,7 +176,7 @@ export const SessionModule = angular
   ])
   .factory('Session', SessionFactory)
   .factory('sessionInterceptor', SessionInterceptorFactory)
-  .run(($rootScope, $state, $location, $log, $mdDialog, Session, Project, appAuth, $mdToast) => {
+  .run(($rootScope, $state, $location, $log, $mdDialog, Session, Project, appAuth) => {
 
     if (!Session.isAuthenticated()) {
       $rootScope.isAuthenticated = false;
