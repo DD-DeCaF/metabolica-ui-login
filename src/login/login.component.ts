@@ -14,7 +14,7 @@ firebase.initializeApp({
 /** This class is LoginComponent's controller */
 class LoginSocialController {
   appName: string;
-  credentials: object;
+  credentials: UserCredentials;
   authenticate: (form: any, credentials: object, firebase: boolean) => void;
   signInWithSocial: (form: any, provider: string) => void;
 
@@ -30,7 +30,7 @@ class LoginSocialController {
       password: '',
     };
 
-    this.authenticate = async (form: any, credentials: object, firebase: boolean = false) => {
+    this.authenticate = async (form: any, credentials: UserCredentials | FirebaseCredentials, firebase: boolean = false) => {
       try {
         await Session.authenticate(credentials, firebase);
         // need to refresh the page before proceeding

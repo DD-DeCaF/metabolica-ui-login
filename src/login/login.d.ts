@@ -7,3 +7,13 @@ declare module "*.json" {
   const json: string;
   export default json;
 }
+
+interface UserCredentials {
+  email: string,
+  password: string,
+}
+
+interface FirebaseCredentials {
+  uid: string,
+  token: string,
+}
