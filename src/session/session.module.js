@@ -31,12 +31,12 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
     },
 
     refresh() {
-      $log.info("Session: Refreshing authorization token");
+      $log.info('Session: Refreshing authorization token');
       return $http.post(`${process.env.IAM_API}/refresh`, `refresh_token=${$localStorage.refresh_token.val}`, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         refreshTokenRequest: true,
       }).then(response => {
-        $log.info("Session: Token refresh successful, saving new authorization token in local storage");
+        $log.info('Session: Token refresh successful, saving new authorization token in local storage');
         $localStorage.authorization_token = response.data;
       }).catch(error => {
         $log.info(`Session: Token refresh failure`);
