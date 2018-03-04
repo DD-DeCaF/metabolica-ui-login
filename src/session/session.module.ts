@@ -49,8 +49,8 @@ function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log:
       return $http.post(`${process.env.IAM_API}${endpoint}`, params, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       }).then(response => {
-        $localStorage.authorization_token = response.data.jwt;
-        $localStorage.refresh_token = response.data.refresh_token;
+        $localStorage.authorization_token = response.data['jwt'];
+        $localStorage.refresh_token = response.data['refresh_token'];
         $rootScope.$broadcast('session:login');
         $rootScope.isAuthenticated = true;
         $log.info(`Session: Authentication successful. Session expires: ${this.expires()}, authorization expires: ${this.authorizationExpires()}`);
@@ -102,7 +102,7 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
       // - there is no active session
       // - for requests to refresh the authorization token
       // - for untrusted hosts
-      if (!$localStorage.authorization_token ||
+      if (!$localStorage['authorization_token'] ||
           config.url === `${process.env.IAM_API}/refresh` ||
           !appAuth.isTrustedURL(config.url)) {
         return config;
@@ -137,7 +137,7 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
         // Wait for the refresh request promise, then add the new authorization token
         return refreshTokenPromise.then(() => {
           $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
-          config.headers.Authorization = `Bearer ${$localStorage.authorization_token}`;
+          config.headers.Authorization = `Bearer ${$localStorage['authorization_token']}`;
           return config;
         }).catch(() => {
           $log.info(`SessionInterceptor: Auth token refresh failed, aborting request`);
@@ -149,7 +149,7 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
 
       // Add the current authorization token
       $log.debug(`SessionInterceptor: Adding authorization header for URL: ${config.url}`);
-      config.headers.Authorization = `Bearer ${$localStorage.authorization_token}`;
+      config.headers.Authorization = `Bearer ${$localStorage['authorization_token']}`;
       return config;
     },
     responseError(response) {
