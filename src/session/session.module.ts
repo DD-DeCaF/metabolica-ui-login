@@ -3,7 +3,7 @@ import 'ngstorage';
 import querystring from 'query-string';
 
 
-function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast) {
+function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log: ng.ILogService, $state, $mdToast) {
   return {
     isAuthenticated() {
       return !this.expired();
@@ -88,7 +88,7 @@ function SessionFactory($http, $localStorage, $rootScope, $log, $state, $mdToast
   };
 }
 
-function SessionInterceptorFactory($q, $injector, appAuth) {
+function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjectorService, appAuth) {
 
   // Points to any ongoing request for refreshing the authorization token. Further requests should wait for this promise to resolve.
   let refreshTokenPromise;
@@ -169,7 +169,7 @@ export const SessionModule = angular
   ])
   .factory('Session', SessionFactory)
   .factory('sessionInterceptor', SessionInterceptorFactory)
-  .run(($rootScope, $state, $location, $log, $mdDialog, Session, Project, appAuth) => {
+  .run(($rootScope, $state, $location: ng.ILocationService, $log: ng.ILogService, $mdDialog, Session, Project, appAuth) => {
 
     if (!Session.isAuthenticated()) {
       $rootScope.isAuthenticated = false;
