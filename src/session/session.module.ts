@@ -34,7 +34,6 @@ function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log:
       $log.info('Session: Refreshing authorization token');
       return $http.post(`${process.env.IAM_API}/refresh`, `refresh_token=${$localStorage.refresh_token.val}`, {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        refreshTokenRequest: true,
       }).then(response => {
         $log.info('Session: Token refresh successful, saving new authorization token in local storage');
         $localStorage.authorization_token = response.data;
@@ -104,7 +103,7 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
       // - for requests to refresh the authorization token
       // - for untrusted hosts
       if (!$localStorage.authorization_token ||
-          config.refreshTokenRequest ||
+          config.url === `${process.env.IAM_API}/refresh` ||
           !appAuth.isTrustedURL(config.url)) {
         return config;
       }
