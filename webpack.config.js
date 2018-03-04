@@ -35,7 +35,8 @@ module.exports = function () {
                 'FIREBASE_DATABASE_URL',
                 'FIREBASE_PROJECT_ID',
                 'FIREBASE_STORAGE_BUCKET',
-                'FIREBASE_SENDER_ID'
+                'FIREBASE_SENDER_ID',
+                'IAM_API'
             ])
         ],
         module: {
