@@ -3,29 +3,29 @@ import 'ngstorage';
 import querystring from 'query-string';
 
 
-function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log: ng.ILogService, $state, $mdToast) {
+function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log: ng.ILogService, $state, $mdToast): SessionFactory {
   return {
-    isAuthenticated() {
+    isAuthenticated(): boolean {
       return !this.expired();
     },
 
-    expired() {
+    expired(): boolean {
       return !$localStorage.refresh_token || this.expires() <= new Date();
     },
 
-    expires() {
+    expires(): Date {
       return new Date(JSON.parse($localStorage.refresh_token.exp) * 1000);
     },
 
-    authorizationExpired() {
+    authorizationExpired(): boolean {
       return !$localStorage.authorization_token || this.authorizationExpires() <= new Date();
     },
 
-    authorizationExpires() {
+    authorizationExpires(): Date {
       return new Date(JSON.parse(atob($localStorage.authorization_token.split('.')[1])).exp * 1000);
     },
 
-    getCurrentUser() {
+    getCurrentUser(): null {
       // metabolica-core user system is not in use
       return null;
     },
@@ -43,7 +43,7 @@ function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log:
       });
     },
 
-    authenticate(credentials, firebase) {
+    authenticate(credentials: UserCredentials | FirebaseCredentials, firebase: boolean) {
       const params = querystring.stringify(credentials);
       const endpoint = firebase ? '/authenticate/firebase' : '/authenticate/local';
       return $http.post(`${process.env.IAM_API}${endpoint}`, params, {
@@ -61,7 +61,7 @@ function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log:
       });
     },
 
-    invalidate() {
+    invalidate(): void {
       $log.debug(`Session: Invalidating session and forcing user to re-login`);
       this.logout();
       $state.go('login').then(() => {
@@ -74,14 +74,14 @@ function SessionFactory($http: ng.IHttpService, $localStorage, $rootScope, $log:
       });
     },
 
-    logout(next = null) {
+    logout(next: string = null): void {
       delete $localStorage.authorization_token;
       delete $localStorage.refresh_token;
       $rootScope.$broadcast('session:logout', {next});
       $rootScope.isAuthenticated = false;
     },
 
-    login(next = null) {
+    login(next: string = null): void {
       $state.go('login');
     }
   };
@@ -95,7 +95,7 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
   return {
     request(config) {
       const $localStorage = $injector.get('$localStorage');
-      const Session = $injector.get('Session');
+      const Session: SessionFactory = $injector.get('Session');
       const $log = $injector.get('$log');
 
       // Ignore authorization logic:
@@ -155,7 +155,8 @@ function SessionInterceptorFactory($q: ng.IQService, $injector: ng.auto.IInjecto
     responseError(response) {
       // TODO this should only trigger for local API urls
       if (response.status === 401 && appAuth.isRequired) {
-        $injector.get('Session').invalidate();
+        const Session: SessionFactory = $injector.get('Session');
+        Session.invalidate();
       }
       return $q.reject(response);
     }
