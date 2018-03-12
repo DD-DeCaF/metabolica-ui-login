@@ -69,7 +69,7 @@ class LoginSocialController {
       }
       firebase.auth().signInWithPopup(providers[provider]).then((result) => {
         firebase.auth().currentUser.getToken(true).then((idToken) => {
-          this.authenticate(form, {'username': result.user.uid, 'password': idToken});
+          this.authenticate(form, {'username': result.user.uid, 'password': idToken}, true);
         }).catch(function(error) {
           console.log(error);
         });
