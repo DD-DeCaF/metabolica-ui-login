@@ -20,7 +20,7 @@ interface Credentials {
 class LoginSocialController {
     appName: string;
     credentials: Credentials;
-    authenticate: (form: any, credentials: Credentials, socialAuth: boolean) => void;
+    authenticate: (form: any, credentials: Credentials) => void;
     signInWithSocial: (form: any, provider: string) => void;
 
     /**

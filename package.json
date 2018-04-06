@@ -1,14 +1,14 @@
 {
   "name": "metabolica-login",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "src/index.js",
   "dependencies": {
     "angular": "^1.6.2",
     "angular-fixed-table-header": "github:daniel-nagy/fixed-table-header",
     "angular-ui-router": "1.0.0-rc.1",
-    "metabolica": "github:biosustain/metabolica-ui",
     "angularfire": "^2.3.0",
-    "firebase": "^3.6.6"
+    "firebase": "^3.6.6",
+    "metabolica": "github:biosustain/metabolica-ui"
   },
   "scripts": {
     "build": "webpack",
